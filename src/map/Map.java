@@ -1,5 +1,6 @@
 package map;
 
+import pathfinding.Pathfinding.Node;
 import pathfinding.Pathfinding;
 import util.Dimension;
 import visualization.Panel;
@@ -7,6 +8,7 @@ import visualization.Panel;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -24,7 +26,24 @@ public class Map {
     }
 
     public void computePath(Pathfinding pathfinding) {
-        LinkedList<Dimension> path = pathfinding.computePath();
+        pathfinding.computePath();
+
+        System.out.println(pathfinding.open);
+
+        for (Node node : pathfinding.open) {
+            this.map[node.getX()][node.getY()] = 3;
+        }
+
+        for (Node node : pathfinding.closed) {
+            this.map[node.getX()][node.getY()] = 4;
+        }
+
+        this.map[pathfinding.start.getX()][pathfinding.start.getY()] = 1;
+        this.map[pathfinding.goal.getX()][pathfinding.goal.getY()] = 1;
+    }
+
+    public boolean isObstacle(Node node) {
+        return this.map[node.getX()][node.getY()] == 5;
     }
 
     public void constructMap() {
@@ -53,8 +72,11 @@ public class Map {
 
     public void initializeTiles() {
         this.tiles[0] = new Tile(255, 255, 255);
-        this.tiles[1] = new Tile(0, 0, 0);
-        this.tiles[2] = new Tile(255, 0, 0);
+        this.tiles[1] = new Tile(0, 0, 255);
+        this.tiles[2] = new Tile(0, 0, 255);
+        this.tiles[3] = new Tile(0, 255, 0);
+        this.tiles[4] = new Tile(255, 0, 0);
+        this.tiles[5] = new Tile(0, 0, 0);
     }
 
     public int getTileNum(int col, int row) {
@@ -66,7 +88,6 @@ public class Map {
             for (int row = 0; row < 50; row++) {
                 int number = map[col][row];
 
-                System.out.println(number);
                 if (number == num) return new Dimension(col, row);
             }
         }
