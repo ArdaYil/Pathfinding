@@ -4,49 +4,81 @@ import map.Map;
 import util.Dimension;
 import visualization.Panel;
 
+import java.util.LinkedList;
+
 public class Pathfinding {
     private int straight = 10;
     private Panel panel;
-    private Dimension[] path;
-    private Dimension start;
-    private Dimension goal;
+    private Node start;
+    private Node goal;
+    private LinkedList<Node> closed = new LinkedList<>();
+    private LinkedList<Node> open = new LinkedList<>();
 
     public Pathfinding(Panel panel) {
         this.panel = panel;
 
-        this.goal = this.getGoalFromMap();
-        this.start = this.getStartFromMap();
+        this.goal = new Node(this.getGoalFromMap());
+        this.start = new Node(this.getStartFromMap());
 
         System.out.println(goal);
         System.out.println(start);
     }
 
-    private Dimension[] getSurroundingNodes(Dimension dimension) {
-        Dimension[] array = new Dimension[8];
+    public LinkedList<Node> computePath() {
+
+        Node currentNode = this.start;
+
+        while (true) {
+            Node[] surroundingNodes = this.getSurroundingNodes(currentNode);
+
+            this.addToOpen(surroundingNodes);
+
+            break;
+        }
+
+        System.out.println(currentNode);
+
+        return closed;
+    }
+
+    public void setFCostToNodes(Node[] nodes) {
+
+    }
+
+    public void addToOpen(Node[] surroundingNodes) {
+        for (int i = 0; i < surroundingNodes.length; i++) {
+            Node surroundingNode = surroundingNodes[i];
+
+            if (surroundingNode == null) continue;
+
+            if (this.open.size() == 0) {
+                for (int j = 0; j < this.open.size(); j++) {
+                    Node openNode = this.open.get(j);
+
+                    if (!openNode.position.equals(surroundingNode.position)) continue;
+
+                    this.open.remove(j);
+                }
+            }
+
+            this.open.addLast(surroundingNode);
+        }
+    }
+
+    private Node[] getSurroundingNodes(Node node) {
+        Node[] array = new Node[8];
         int counter = 0;
 
-        array[counter++] = new Dimension(dimension.getX() - 1, dimension.getY() - 1);
-        array[counter++] = new Dimension(dimension.getX(), dimension.getY() - 1);
-        array[counter++] = new Dimension(dimension.getX() + 1, dimension.getY() - 1);
-        array[counter++] = new Dimension(dimension.getX() - 1, dimension.getY());
-        array[counter++] = new Dimension(dimension.getX() + 2, dimension.getY());
-        array[counter++] = new Dimension(dimension.getX() - 1, dimension.getY() + 1);
-        array[counter++] = new Dimension(dimension.getX(), dimension.getY() + 1);
-        array[counter] = new Dimension(dimension.getX() + 1, dimension.getY() + 1);
+        array[counter++] = new Node(new Dimension(node.getX() - 1, node.getY() - 1));
+        array[counter++] = new Node(new Dimension(node.getX(), node.getY() - 1));
+        array[counter++] = new Node(new Dimension(node.getX() + 1, node.getY() - 1));
+        array[counter++] = new Node(new Dimension(node.getX() - 1, node.getY()));
+        array[counter++] = new Node(new Dimension(node.getX() + 1, node.getY()));
+        array[counter++] = new Node(new Dimension(node.getX() - 1, node.getY() + 1));
+        array[counter++] = new Node(new Dimension(node.getX(), node.getY() + 1));
+        array[counter] = new Node(new Dimension(node.getX() + 1, node.getY() + 1));
 
         return array;
-    }
-
-    private int getGCost() {
-
-    }
-
-    private int getHCost() {
-
-    }
-
-    private int getFCost() {
-
     }
 
     private Dimension getGoalFromMap() {
@@ -55,5 +87,50 @@ public class Pathfinding {
 
     private Dimension getStartFromMap() {
         return this.panel.map.getTilePosition(2);
+    }
+
+    private class Node {
+        private Dimension position;
+        private int gCost;
+        private int hCost;
+        private int fCost;
+
+        public Node(Dimension position) {
+            this.position = position;
+        }
+
+        public int getX() {
+            return this.position.getX();
+        }
+
+        public int getY() {
+            return this.position.getY();
+        }
+
+        private int getGCost() {
+            return 1;
+        }
+
+        private int getHCost() {
+            return 1;
+        }
+
+        private void setFCost() {
+            int gCost = this.getGCost();
+            int hCost = this.getHCost();
+
+            this.gCost = gCost;
+            this.hCost = hCost;
+            this.fCost = gCost + hCost;
+        }
+
+        @Override
+        public String toString() {
+            return "Node: { gCost: " +
+                    this.gCost + ", hCost: " +
+                    this.hCost + ", fCost: " +
+                    this.fCost + ", " +
+                    this.position;
+        }
     }
 }

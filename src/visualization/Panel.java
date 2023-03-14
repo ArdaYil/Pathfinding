@@ -5,6 +5,7 @@ import pathfinding.Pathfinding;
 
 import javax.swing.JPanel;
 import java.awt.*;
+import java.util.LinkedList;
 
 public class Panel extends JPanel implements Runnable {
     private static final int rows = 50;
@@ -25,6 +26,7 @@ public class Panel extends JPanel implements Runnable {
         this.thread.start();
         this.map = new Map(this);
         this.pathfinding = new Pathfinding(this);
+        this.map.computePath(this.pathfinding);
     }
 
     @Override

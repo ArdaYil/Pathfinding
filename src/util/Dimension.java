@@ -25,6 +25,12 @@ public class Dimension {
         this.y = y;
     }
 
+    public boolean equals(Dimension other) {
+        if (this.x == other.x && this.y == other.y) return true;
+
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Dimension: { x: " + this.x + ", y: " + this.y + " }";

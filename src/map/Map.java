@@ -1,11 +1,13 @@
 package map;
 
+import pathfinding.Pathfinding;
 import util.Dimension;
 import visualization.Panel;
 
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -19,6 +21,10 @@ public class Map {
         this.initializeTiles();
         this.constructMap();
         this.panel = panel;
+    }
+
+    public void computePath(Pathfinding pathfinding) {
+        LinkedList<Dimension> path = pathfinding.computePath();
     }
 
     public void constructMap() {
