@@ -16,7 +16,7 @@ public class Panel extends JPanel implements Runnable {
 
     private Thread thread;
     public Map map;
-    private Pathfinding pathfinding;
+    public Pathfinding pathfinding;
 
     public Panel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));

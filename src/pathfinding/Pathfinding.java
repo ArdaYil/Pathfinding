@@ -26,7 +26,6 @@ public class Pathfinding {
     }
 
     public LinkedList<Node> computePath() {
-
         Node currentNode = this.start;
 
         int count = 0;
@@ -38,11 +37,15 @@ public class Pathfinding {
             this.addToOpen(surroundingNodes);
             this.closed.addLast(currentNode);
 
+            int index = this.getIndexOfNodeInOpen(currentNode);
+
+            if (index >= 0) this.open.remove(index);
+
             currentNode = this.getNewNode();
 
             count++;
 
-            if (count == 1000) break;
+            if (count == 5000) break;
 
             if (currentNode.position.equals(this.goal.position)) break;
         }
@@ -50,8 +53,22 @@ public class Pathfinding {
         return closed;
     }
 
+    public int getIndexOfNodeInOpen(Node node) {
+        int counter = 0;
+
+        for (Node openNode : this.open) {
+            if (openNode.position.equals(node.position)) return counter;
+            counter++;
+        }
+
+        return -1;
+    }
+
     private void setFCostToNodes(Node[] nodes, Node root) {
         for (Node node : nodes) {
+            if (node == null) continue;
+            if (this.isClosed(node)) continue;
+
             node.setFCost(root);
         }
     }
@@ -64,14 +81,13 @@ public class Pathfinding {
             if (this.isClosed(surroundingNode)) continue;
             if (this.panel.map.isObstacle(surroundingNode)) continue;
 
-            if (this.open.size() == 0) {
-                for (int j = 0; j < this.open.size(); j++) {
-                    Node openNode = this.open.get(j);
+            for (int j = 0; j < this.open.size(); j++) {
+                Node openNode = this.open.get(j);
 
-                    if (!openNode.position.equals(surroundingNode.position)) continue;
+                if (!openNode.position.equals(surroundingNode.position)) continue;
 
-                    this.open.remove(j);
-                }
+                this.open.remove(j);
+                break;
             }
 
             this.open.addLast(surroundingNode);
@@ -80,7 +96,7 @@ public class Pathfinding {
 
     private boolean isClosed(Node node) {
         for (Node checkNode : this.closed) {
-            if (node == checkNode) return true;
+            if (node.position.equals(checkNode)) return true;
         }
 
         return false;
@@ -116,14 +132,10 @@ public class Pathfinding {
         Node[] array = new Node[8];
         int counter = 0;
 
-        array[counter++] = new Node(new Dimension(node.getX() - 1, node.getY() - 1));
         array[counter++] = new Node(new Dimension(node.getX(), node.getY() - 1));
-        array[counter++] = new Node(new Dimension(node.getX() + 1, node.getY() - 1));
         array[counter++] = new Node(new Dimension(node.getX() - 1, node.getY()));
         array[counter++] = new Node(new Dimension(node.getX() + 1, node.getY()));
-        array[counter++] = new Node(new Dimension(node.getX() - 1, node.getY() + 1));
         array[counter++] = new Node(new Dimension(node.getX(), node.getY() + 1));
-        array[counter] = new Node(new Dimension(node.getX() + 1, node.getY() + 1));
 
         return array;
     }
@@ -134,6 +146,22 @@ public class Pathfinding {
 
     private Dimension getStartFromMap() {
         return this.panel.map.getTilePosition(2);
+    }
+
+    public int getFCostFromOpen(Dimension position) {
+        for (Node node : this.open) {
+            if (node.position.equals(position)) return node.fCost;
+        }
+
+        return -1;
+    }
+
+    public int getFCostFromClosed(Dimension position) {
+        for (Node node : this.closed) {
+            if (node.position.equals(position)) return node.fCost;
+        }
+
+        return -1;
     }
 
     public class Node {

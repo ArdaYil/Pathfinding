@@ -28,14 +28,12 @@ public class Map {
     public void computePath(Pathfinding pathfinding) {
         pathfinding.computePath();
 
-        System.out.println(pathfinding.open);
+        for (Node node : pathfinding.closed) {
+            this.map[node.getX()][node.getY()] = 4;
+        }
 
         for (Node node : pathfinding.open) {
             this.map[node.getX()][node.getY()] = 3;
-        }
-
-        for (Node node : pathfinding.closed) {
-            this.map[node.getX()][node.getY()] = 4;
         }
 
         this.map[pathfinding.start.getX()][pathfinding.start.getY()] = 1;
@@ -56,11 +54,12 @@ public class Map {
                 String[] tiles = line.split(" ");
 
                 for (int col = 0; col < this.panel.cols; col++) {
-                    System.out.println(col + ", " + row);
                     this.map[col][row] = Integer.parseInt(tiles[col]);
                 }
 
                 row++;
+
+                if (row == this.panel.rows) break;
 
                 line = reader.readLine();
             }
@@ -108,6 +107,17 @@ public class Map {
                 g2.drawRect(col * nodeSize, row * nodeSize, nodeSize, nodeSize);
                 g2.setColor(tile.getColor());
                 g2.fillRect(col * nodeSize + 1, row * nodeSize + 1, nodeSize - 1, nodeSize - 1);
+
+                int fCost1 = this.panel.pathfinding.getFCostFromOpen(new Dimension(col, row));
+                int fCost2 = this.panel.pathfinding.getFCostFromClosed(new Dimension(col, row));
+
+                g2.setColor(new Color(0, 0, 0));
+
+                if (fCost2 != -1)
+                    g2.drawString(Integer.toString(fCost2), (col * nodeSize + nodeSize/2), (row * nodeSize + nodeSize/2));
+
+                else if (fCost1 != -1)
+                    g2.drawString(Integer.toString(fCost1), (col * nodeSize + nodeSize/2), (row * nodeSize + nodeSize/2));
             }
         }
     }
