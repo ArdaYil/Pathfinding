@@ -27,17 +27,6 @@ public class Map {
 
     public void computePath(Pathfinding pathfinding) {
         pathfinding.computePath();
-
-        for (Node node : pathfinding.closed) {
-            this.map[node.getX()][node.getY()] = 4;
-        }
-
-        for (Node node : pathfinding.open) {
-            this.map[node.getX()][node.getY()] = 3;
-        }
-
-        this.map[pathfinding.start.getX()][pathfinding.start.getY()] = 1;
-        this.map[pathfinding.goal.getX()][pathfinding.goal.getY()] = 1;
     }
 
     public boolean isObstacle(Node node) {
@@ -77,6 +66,7 @@ public class Map {
         this.tiles[3] = new Tile(0, 255, 0);
         this.tiles[4] = new Tile(255, 0, 0);
         this.tiles[5] = new Tile(0, 0, 0);
+        this.tiles[6] = new Tile(255, 255, 0);
     }
 
     public int getTileNum(int col, int row) {
@@ -98,6 +88,21 @@ public class Map {
     public void draw(Graphics2D g2) {
         int nodeSize = this.panel.nodeSize;
 
+        for (Node node : this.panel.pathfinding.closed) {
+            this.map[node.getX()][node.getY()] = 4;
+        }
+
+        for (Node node : this.panel.pathfinding.open) {
+            this.map[node.getX()][node.getY()] = 3;
+        }
+
+        for (Node node : this.panel.pathfinding.path) {
+            this.map[node.getX()][node.getY()] = 6;
+        }
+
+        this.map[this.panel.pathfinding.start.getX()][this.panel.pathfinding.start.getY()] = 1;
+        this.map[this.panel.pathfinding.goal.getX()][this.panel.pathfinding.goal.getY()] = 1;
+
         for (int col = 0; col < this.panel.cols; col++) {
             for (int row = 0; row < this.panel.rows; row++) {
                 int number = this.map[col][row];
@@ -108,16 +113,16 @@ public class Map {
                 g2.setColor(tile.getColor());
                 g2.fillRect(col * nodeSize + 1, row * nodeSize + 1, nodeSize - 1, nodeSize - 1);
 
-                int fCost1 = this.panel.pathfinding.getFCostFromOpen(new Dimension(col, row));
-                int fCost2 = this.panel.pathfinding.getFCostFromClosed(new Dimension(col, row));
+                /*int fCost1 = this.panel.pathfinding.getFCostFromOpen(new Dimension(col, row));
+                int fCost2 = this.panel.pathfinding.getFCostFromClosed(new Dimension(col, row));*/
 
                 g2.setColor(new Color(0, 0, 0));
 
-                if (fCost2 != -1)
+                /*if (fCost2 != -1)
                     g2.drawString(Integer.toString(fCost2), (col * nodeSize + nodeSize/2), (row * nodeSize + nodeSize/2));
 
                 else if (fCost1 != -1)
-                    g2.drawString(Integer.toString(fCost1), (col * nodeSize + nodeSize/2), (row * nodeSize + nodeSize/2));
+                    g2.drawString(Integer.toString(fCost1), (col * nodeSize + nodeSize/2), (row * nodeSize + nodeSize/2));*/
             }
         }
     }

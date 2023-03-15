@@ -25,8 +25,11 @@ public class Panel extends JPanel implements Runnable {
         this.thread = new Thread(this);
         this.thread.start();
         this.map = new Map(this);
-        this.pathfinding = new Pathfinding(this);
-        this.map.computePath(this.pathfinding);
+
+        new Thread(() -> {
+            this.pathfinding = new Pathfinding(this);
+            this.map.computePath(this.pathfinding);
+        }).start();
     }
 
     @Override

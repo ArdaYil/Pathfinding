@@ -11,14 +11,15 @@ public class Pathfinding {
     private Panel panel;
     public Node start;
     public Node goal;
+    public LinkedList<Node> path = new LinkedList<>();
     public LinkedList<Node> closed = new LinkedList<>();
     public LinkedList<Node> open = new LinkedList<>();
 
     public Pathfinding(Panel panel) {
         this.panel = panel;
 
-        this.goal = new Node(this.getGoalFromMap());
-        this.start = new Node(this.getStartFromMap());
+        this.goal = new Node(this.getGoalFromMap(), null);
+        this.start = new Node(this.getStartFromMap(), null);
 
         this.start.gCost = 0;
         this.goal.hCost = 0;
@@ -31,6 +32,12 @@ public class Pathfinding {
         int count = 0;
 
         while (true) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
             Node[] surroundingNodes = this.getSurroundingNodes(currentNode);
 
             this.setFCostToNodes(surroundingNodes, currentNode);
@@ -38,19 +45,35 @@ public class Pathfinding {
             this.closed.addLast(currentNode);
 
             int index = this.getIndexOfNodeInOpen(currentNode);
-
             if (index >= 0) this.open.remove(index);
+
+            Node parent = currentNode;
 
             currentNode = this.getNewNode();
 
             count++;
 
-            if (count == 5000) break;
+            if (count == 1000) break;
 
-            if (currentNode.position.equals(this.goal.position)) break;
+            if (currentNode == null) break;
+            if (currentNode.position.equals(this.goal.position)) {
+                this.goal.parent = parent;
+                break;
+            }
         }
 
+        this.createPath();
+
         return closed;
+    }
+
+    private void createPath() {
+        Node currentNode = this.goal;
+
+        while (currentNode != null) {
+            this.path.addLast(currentNode);
+            currentNode = currentNode.parent;
+        }
     }
 
     public int getIndexOfNodeInOpen(Node node) {
@@ -96,7 +119,7 @@ public class Pathfinding {
 
     private boolean isClosed(Node node) {
         for (Node checkNode : this.closed) {
-            if (node.position.equals(checkNode)) return true;
+            if (node.position.equals(checkNode.position)) return true;
         }
 
         return false;
@@ -105,9 +128,24 @@ public class Pathfinding {
     private Node getNewNode() {
         LinkedList<Node> currentNodes = new LinkedList<>();
 
-        int lowest = this.open.getFirst().fCost;
+        Node first = this.open.getFirst();
+        int lowest = first.fCost;
+        currentNodes.addLast(first);
+
+      /*  for (Node node : this.open) {
+            if (this.isClosed(node)) continue;
+
+            lowest = node.fCost;
+            first = node;
+            break;
+        }*/
+
+        System.out.println(this.open.size());
 
         for (Node node : this.open) {
+            if (node.position.equals(first.position)) continue;
+           /* if (this.isClosed(node)) continue;*/
+
             if (node.fCost == lowest) {
                 currentNodes.addLast(node);
             }
@@ -115,14 +153,20 @@ public class Pathfinding {
             else if (node.fCost < lowest) {
                 currentNodes = new LinkedList<>();
                 currentNodes.addLast(node);
+                lowest = node.fCost;
             }
         }
+
+        if (currentNodes.size() == 0) return null;
 
         int lowestHCost = currentNodes.getFirst().hCost;
         Node currentNode = currentNodes.getFirst();
 
         for (Node node : currentNodes) {
-            if (node.hCost < lowestHCost) currentNode = node;
+            if (node.hCost < lowestHCost) {
+                currentNode = node;
+                lowestHCost = node.hCost;
+            };
         }
 
         return currentNode;
@@ -132,10 +176,10 @@ public class Pathfinding {
         Node[] array = new Node[8];
         int counter = 0;
 
-        array[counter++] = new Node(new Dimension(node.getX(), node.getY() - 1));
-        array[counter++] = new Node(new Dimension(node.getX() - 1, node.getY()));
-        array[counter++] = new Node(new Dimension(node.getX() + 1, node.getY()));
-        array[counter++] = new Node(new Dimension(node.getX(), node.getY() + 1));
+        array[counter++] = new Node(new Dimension(node.getX(), node.getY() - 1), node);
+        array[counter++] = new Node(new Dimension(node.getX() - 1, node.getY()), node);
+        array[counter++] = new Node(new Dimension(node.getX() + 1, node.getY()), node);
+        array[counter++] = new Node(new Dimension(node.getX(), node.getY() + 1), node);
 
         return array;
     }
@@ -150,7 +194,7 @@ public class Pathfinding {
 
     public int getFCostFromOpen(Dimension position) {
         for (Node node : this.open) {
-            if (node.position.equals(position)) return node.fCost;
+            if (node.position.equals(position)) return node.hCost;
         }
 
         return -1;
@@ -158,7 +202,7 @@ public class Pathfinding {
 
     public int getFCostFromClosed(Dimension position) {
         for (Node node : this.closed) {
-            if (node.position.equals(position)) return node.fCost;
+            if (node.position.equals(position)) return node.hCost;
         }
 
         return -1;
@@ -169,9 +213,11 @@ public class Pathfinding {
         private int gCost;
         private int hCost;
         private int fCost;
+        private Node parent;
 
-        public Node(Dimension position) {
+        public Node(Dimension position, Node parent) {
             this.position = position;
+            this.parent = parent;
         }
 
         public int getX() {
