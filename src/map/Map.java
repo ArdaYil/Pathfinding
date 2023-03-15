@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public class Map {
     private Tile[] tiles = new Tile[10];
-    private int[][] map = new int[50][50];
+    private int[][] map = new int[this.panel.cols][this.panel.rows];
 
     private Panel panel;
 
@@ -55,7 +55,8 @@ public class Map {
             while (line != null) {
                 String[] tiles = line.split(" ");
 
-                for (int col = 0; col < 50; col++) {
+                for (int col = 0; col < this.panel.cols; col++) {
+                    System.out.println(col + ", " + row);
                     this.map[col][row] = Integer.parseInt(tiles[col]);
                 }
 
@@ -84,8 +85,8 @@ public class Map {
     }
 
     public Dimension getTilePosition(int num) {
-        for (int col = 0; col < 50; col++) {
-            for (int row = 0; row < 50; row++) {
+        for (int col = 0; col < this.panel.cols; col++) {
+            for (int row = 0; row < this.panel.rows; row++) {
                 int number = map[col][row];
 
                 if (number == num) return new Dimension(col, row);
@@ -98,8 +99,8 @@ public class Map {
     public void draw(Graphics2D g2) {
         int nodeSize = this.panel.nodeSize;
 
-        for (int col = 0; col < 50; col++) {
-            for (int row = 0; row < 50; row++) {
+        for (int col = 0; col < this.panel.cols; col++) {
+            for (int row = 0; row < this.panel.rows; row++) {
                 int number = this.map[col][row];
                 Tile tile = this.tiles[number];
 

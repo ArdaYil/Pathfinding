@@ -8,9 +8,9 @@ import java.awt.*;
 import java.util.LinkedList;
 
 public class Panel extends JPanel implements Runnable {
-    private static final int rows = 50;
-    private static final int cols = 50;
-    public static final int nodeSize = 16;
+    public static final int rows = 25;
+    public static final int cols = 25;
+    public static final int nodeSize = 32;
     private static final int screenWidth = cols * nodeSize;
     private static final int screenHeight = rows * nodeSize;
 
