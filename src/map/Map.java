@@ -26,7 +26,9 @@ public class Map {
     }
 
     public void computePath(Pathfinding pathfinding) {
-        pathfinding.computePath();
+        LinkedList<Node> value = pathfinding.computePath();
+
+        if (value == null) System.out.println("Path Not Found");
     }
 
     public boolean isObstacle(Node node) {
@@ -88,13 +90,13 @@ public class Map {
     public void draw(Graphics2D g2) {
         int nodeSize = this.panel.nodeSize;
 
-        for (Node node : this.panel.pathfinding.closed) {
+        /*for (Node node : this.panel.pathfinding.closed) {
             this.map[node.getX()][node.getY()] = 4;
         }
 
         for (Node node : this.panel.pathfinding.open) {
             this.map[node.getX()][node.getY()] = 3;
-        }
+        }*/
 
         for (Node node : this.panel.pathfinding.path) {
             this.map[node.getX()][node.getY()] = 6;

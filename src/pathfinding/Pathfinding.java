@@ -32,11 +32,11 @@ public class Pathfinding {
         int count = 0;
 
         while (true) {
-            try {
-                Thread.sleep(100);
+            /*try {
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
-            }
+            }*/
 
             Node[] surroundingNodes = this.getSurroundingNodes(currentNode);
 
@@ -48,6 +48,8 @@ public class Pathfinding {
             if (index >= 0) this.open.remove(index);
 
             Node parent = currentNode;
+
+            if (this.open.isEmpty()) return null;
 
             currentNode = this.getNewNode();
 
@@ -72,6 +74,21 @@ public class Pathfinding {
 
         while (currentNode != null) {
             this.path.addLast(currentNode);
+
+            Node[] surroundingNodes = this.getSurroundingNodes(currentNode);
+
+            for (Node surroundingNode : surroundingNodes) {
+                if (surroundingNode == null) continue;
+
+                Dimension goal = this.getGoalFromMap();
+                if (goal == null) break;
+                if (goal.equals(surroundingNode.position)) {
+                    //currentNode = surroundingNode;
+
+                    return;
+                }
+            }
+
             currentNode = currentNode.parent;
         }
     }
@@ -173,13 +190,25 @@ public class Pathfinding {
     }
 
     private Node[] getSurroundingNodes(Node node) {
-        Node[] array = new Node[8];
+        Node[] array = new Node[4];
         int counter = 0;
 
         array[counter++] = new Node(new Dimension(node.getX(), node.getY() - 1), node);
         array[counter++] = new Node(new Dimension(node.getX() - 1, node.getY()), node);
         array[counter++] = new Node(new Dimension(node.getX() + 1, node.getY()), node);
-        array[counter++] = new Node(new Dimension(node.getX(), node.getY() + 1), node);
+        array[counter] = new Node(new Dimension(node.getX(), node.getY() + 1), node);
+
+        int count = 0;
+
+        for (Node surroundingNode : array) {
+            int x = surroundingNode.getX();
+            int y = surroundingNode.getY();
+
+            if (x < 0 || x >= this.panel.cols) array[count] = null;
+            else if (y < 0 || y >= this.panel.cols) array[count] = null;
+
+            count++;
+        }
 
         return array;
     }
